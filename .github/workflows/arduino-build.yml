@@ -1,0 +1,40 @@
+name: Install Arduino CLI and Run Compilation
+
+on:
+  push:
+    branches:
+      - github-actions
+  pull_request:
+    branches:
+      - github-actions
+
+jobs:
+  install-and-compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout github actions branch
+        uses: actions/checkout@v2
+        with:
+          ref: github-actions 
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install -y curl git python3 python3-pip
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          sudo mv bin/arduino-cli /usr/local/bin/
+
+      - name: Verify Arduino CLI installation
+        run: |
+          which arduino-cli
+          arduino-cli version
+
+      - name: Run autocompile script
+        run: |
+          cd ./src
+          ./MakeSymLinks.sh
+          ./autocompile.sh
